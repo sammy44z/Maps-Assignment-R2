@@ -1,4 +1,4 @@
-import {  useContext, useState } from "react";
+import { useContext, useState } from "react";
 import Route from "../common/route";
 import PopupComponent from "./CreateRoutePopup";
 import RouteDisplay from "./RouteDisplay";
@@ -6,21 +6,36 @@ import RouteContext from "../context/routesContext";
 
 function RoutesList() {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const {routesList,setRoutesList,setSelectedRoute} = useContext(RouteContext);
-  const [editRoute, setEditRoute] = useState<Route|undefined>(undefined);
-  function updateRoute(route:Route){
+  const { routesList, setRoutesList, setSelectedRoute } =
+    useContext(RouteContext);
+  const [editRoute, setEditRoute] = useState<Route | undefined>(undefined);
+  function updateRoute(route: Route) {
     setEditRoute(route);
     setIsPopupOpen(true);
   }
 
-  function onclose(){
+  function onclose() {
     // setEditRoute(undefined);
     setIsPopupOpen(false);
   }
 
-  function addRoute(){
+  function addRoute() {
     setEditRoute(undefined);
-    setIsPopupOpen(true)
+    setIsPopupOpen(true);
+  }
+
+  function handleExport() {
+    const blob = new Blob([JSON.stringify(routesList)], {
+      type: "text/plain;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "routes.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   }
 
   return (
@@ -36,10 +51,13 @@ function RoutesList() {
               >
                 Add Route
               </button>
-              <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+              {/* <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
                 Import
-              </button>
-              <button className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded">
+              </button> */}
+              <button
+                onClick={handleExport}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
+              >
                 Export
               </button>
             </div>
@@ -48,22 +66,33 @@ function RoutesList() {
 
         <div className="flex-grow overflow-y-auto p-4">
           {routesList.map((route: Route, index: number) => (
-            <div  key={route.RouteId}  onClick={()=>{setSelectedRoute(route)}}>
-            <RouteDisplay  index={index} route={route}  setEditRoute={updateRoute} />
-              </div>
+            <div
+              key={route.RouteId}
+              onClick={() => {
+                setSelectedRoute(route);
+              }}
+            >
+              <RouteDisplay
+                index={index}
+                route={route}
+                setEditRoute={updateRoute}
+              />
+            </div>
           ))}
         </div>
       </div>
-      
-      {isPopupOpen && <div>
-        <PopupComponent
-          routesList = {routesList} 
-          editRoute={editRoute}
-          isOpen={isPopupOpen}
-          onClose={onclose}
-          onSubmit={setRoutesList}
-        />
-      </div>}
+
+      {isPopupOpen && (
+        <div>
+          <PopupComponent
+            routesList={routesList}
+            editRoute={editRoute}
+            isOpen={isPopupOpen}
+            onClose={onclose}
+            onSubmit={setRoutesList}
+          />
+        </div>
+      )}
     </>
   );
 }

@@ -12,7 +12,7 @@ function App() {
   
   return (
     <RouteContext.Provider value={{ routesList, setRoutesList, selectedRoute, setSelectedRoute }}>
-      <APIProvider apiKey={"AIzaSyCItlF7EotBQE82cfgFVGBm5wzJGNNsUyg"}>
+      <APIProvider apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}>
         <Outlet />
       </APIProvider>
     </RouteContext.Provider>
