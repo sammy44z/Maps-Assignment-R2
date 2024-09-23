@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-import Autocomplete from "react-google-autocomplete";
+import React, { lazy, Suspense, useContext, useEffect, useRef, useState } from "react";
 import { PopupProps } from "../common/popup";
 import Route, { Stop } from "../common/route";
 import RouteContext from "../context/routesContext";
@@ -11,6 +10,7 @@ const PopupComponent: React.FC<PopupProps> = ({
   onClose,
   onSubmit,
 }) => {
+  const Autocomplete = lazy(() => import("react-google-autocomplete"));
   const {setRoutesList} = useContext(RouteContext)
   const [route, setRoute] = useState<Route>({
     Name: "",
@@ -26,6 +26,8 @@ const PopupComponent: React.FC<PopupProps> = ({
     Latitude: 0,
     Longitude: 0,
   });
+  const autocompleteRef = useRef<HTMLInputElement>(null);
+  
   useEffect(() => {
     if (editRoute != undefined) {
       setRoute(editRoute);
@@ -62,6 +64,10 @@ const PopupComponent: React.FC<PopupProps> = ({
   const addStop = () => {
     setRoute((prev) => ({ ...prev, Stops: [...prev.Stops, newStop] }));
     setNewStop({ StopId: "", StopName: "", Latitude: 0, Longitude: 0 });
+
+    if (autocompleteRef.current) {
+      autocompleteRef.current.value = '';
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -189,7 +195,26 @@ const PopupComponent: React.FC<PopupProps> = ({
                 <div className="grid grid-cols-2 gap-2">
 
                   {/* <label className="block mb-2">Stop Name (Autocomplete):</label> */}
+                  {/* <Autocomplete
+                    ref={autocompleteRef}
+                    apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
+                    onPlaceSelected={(place) => {
+                      setNewStop({
+                        ...newStop,
+                        StopName: place?.formatted_address,
+                        Latitude: place?.geometry?.location?.lat(),
+                        Longitude: place?.geometry?.location?.lng(),
+                      });
+                    }}
+                    options={{
+                      types: ['geocode'],
+                      componentRestrictions: { country: 'in' },
+                    }}
+                    className="border rounded px-2 py-1"
+                  /> */}
+                  <Suspense fallback={<div>Loading...</div>}>
                   <Autocomplete
+                    ref={autocompleteRef}
                     apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
                     onPlaceSelected={(place) => {
                       setNewStop({
@@ -205,6 +230,7 @@ const PopupComponent: React.FC<PopupProps> = ({
                     }}
                     className="border rounded px-2 py-1"
                   />
+                  </Suspense>
                   <input
                     type="text"
                     name="StopId"
