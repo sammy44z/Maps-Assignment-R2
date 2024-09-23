@@ -1,8 +1,8 @@
 export interface Stop {
     StopId: string;
-    StopName: string;
-    Latitude: number;
-    Longitude: number;
+    StopName: string | undefined;
+    Latitude: number | undefined;
+    Longitude: number | undefined;
   }
   
 interface Route {
