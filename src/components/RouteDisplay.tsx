@@ -26,10 +26,10 @@ function RouteDisplay({
   return (
     <div
       key={route.RouteId}
-      className={`w-full bg-white shadow-md border border-gray-200 rounded-lg ${
+      className={`w-full bg-white shadow-md border rounded-lg ${
         selectedRoute && selectedRoute.RouteId === route.RouteId
           ? "border-2 border-blue-500"
-          : ""
+          : "border-gray-200"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
