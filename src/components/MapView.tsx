@@ -75,7 +75,7 @@ function MapView() {
         <Map
           style={{
             width: "100%",
-            height: "58vh",
+            height: "56vh",
             margin: "auto",
           }}
           defaultCenter={location}

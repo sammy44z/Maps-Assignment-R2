@@ -1,14 +1,8 @@
-import React, {
-  lazy,
-  Suspense,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { PopupProps } from "../common/models/popup";
 import Route, { Stop } from "../common/models/route";
 import RouteContext from "../context/routesContext";
+import { useMapsLibrary } from "@vis.gl/react-google-maps";
 
 const PopupComponent: React.FC<PopupProps> = ({
   routesList,
@@ -17,7 +11,6 @@ const PopupComponent: React.FC<PopupProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const Autocomplete = lazy(() => import("react-google-autocomplete"));
   const { setRoutesList } = useContext(RouteContext);
   const [route, setRoute] = useState<Route>({
     Name: "",
@@ -33,7 +26,30 @@ const PopupComponent: React.FC<PopupProps> = ({
     Latitude: 0,
     Longitude: 0,
   });
-  const autocompleteRef = useRef<HTMLInputElement>(null);
+  const autocompleteInputRef = useRef<HTMLInputElement>(null);
+  const placesLib = useMapsLibrary("places");
+
+  useEffect(() => {
+    if (placesLib && autocompleteInputRef.current) {
+      const autocomplete = new placesLib.Autocomplete(
+        autocompleteInputRef.current,
+        {
+          types: ["geocode"],
+          componentRestrictions: { country: "in" },
+        }
+      );
+
+      autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        setNewStop({
+          ...newStop,
+          StopName: place?.formatted_address,
+          Latitude: place?.geometry?.location?.lat(),
+          Longitude: place?.geometry?.location?.lng(),
+        });
+      });
+    }
+  }, [placesLib]);
 
   useEffect(() => {
     if (editRoute != undefined) {
@@ -72,8 +88,8 @@ const PopupComponent: React.FC<PopupProps> = ({
     setRoute((prev) => ({ ...prev, Stops: [...prev.Stops, newStop] }));
     setNewStop({ StopId: "", StopName: "", Latitude: 0, Longitude: 0 });
 
-    if (autocompleteRef.current) {
-      autocompleteRef.current.value = "";
+    if (autocompleteInputRef.current) {
+      autocompleteInputRef.current.value = "";
     }
   };
 
@@ -183,71 +199,33 @@ const PopupComponent: React.FC<PopupProps> = ({
                         </span>
                       </div>
                       <button
-                      onClick={() => removeStop(index)}
-                      className="text-red-500 hover:text-red-700"
-                      type="button"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
+                        onClick={() => removeStop(index)}
+                        className="text-red-500 hover:text-red-700"
+                        type="button"
                       >
-                        <path
-                          fillRule="evenodd"
-                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
                     </div>
                   ))}
                 </div>
-                {/* {route.Stops.map((stop, index) => (
-                  <div key={index} className="mb-2">
-                    <span>
-                      {stop.StopName} ({stop.Latitude}, {stop.Longitude})
-                    </span>
-                    <button
-                      onClick={() => removeStop(index)}
-                      className="text-red-500 hover:text-red-700"
-                      type="button"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                ))} */}
                 <div className="grid grid-cols-2 gap-2">
-                  <Suspense fallback={<div>Loading...</div>}>
-                    <Autocomplete
-                      ref={autocompleteRef}
-                      apiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY}
-                      onPlaceSelected={(place) => {
-                        setNewStop({
-                          ...newStop,
-                          StopName: place?.formatted_address,
-                          Latitude: place?.geometry?.location?.lat(),
-                          Longitude: place?.geometry?.location?.lng(),
-                        });
-                      }}
-                      options={{
-                        types: ["geocode"],
-                        componentRestrictions: { country: "in" },
-                      }}
-                      className="border rounded px-2 py-1"
-                    />
-                  </Suspense>
+                  <input
+                    ref={autocompleteInputRef}
+                    type="text"
+                    placeholder="Enter a location"
+                    className="border rounded px-2 py-1 w-full"
+                  />
                   <input
                     type="text"
                     name="StopId"
@@ -256,14 +234,6 @@ const PopupComponent: React.FC<PopupProps> = ({
                     placeholder="Stop ID"
                     className="border rounded px-2 py-1"
                   />
-                  {/* <input
-                    type="text"
-                    name="StopName"
-                    value={newStop.StopName}
-                    onChange={handleStopChange}
-                    placeholder="Stop Name"
-                    className="border rounded px-2 py-1"
-                  /> */}
                   <input
                     type="number"
                     name="Latitude"
