@@ -2,7 +2,7 @@ import { APIProvider } from "@vis.gl/react-google-maps";
 import { Outlet } from "react-router-dom";
 import RouteContext from "./context/routesContext";
 import { useState } from "react";
-import Route from "./common/route";
+import Route from "./common/models/route";
 import mockRouteList from "./Utils/mockData";
 
 function App() {

@@ -8,10 +8,10 @@ function Home() {
   return (
     <>
       <div className="flex flex-col h-screen">
-        <div className="h-1/3 overflow-auto">
+        <div className="h-2/5 overflow-auto">
           <RoutesList />
         </div>
-        <div className="h-2/3">
+        <div className="h-3/5">
           <Suspense fallback={<div>Google Map Loading</div>}>
             <MapView />
           </Suspense>

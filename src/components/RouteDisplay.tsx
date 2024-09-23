@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import Route from "../common/route";
+import Route from "../common/models/route";
 import RouteContext from "../context/routesContext";
 
 function RouteDisplay({
@@ -32,9 +32,9 @@ function RouteDisplay({
           : "border-gray-200"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-center justify-between -mx-2">
-          <div className="w-1/3 flex items-center px-2 py-1">
+          <div className="w-1/4 flex items-center px-2 py-1">
             <h1 className="text-lg font-semibold text-gray-800 mr-2">
               {route.RouteId} | {route.Name}
             </h1>
@@ -42,22 +42,23 @@ function RouteDisplay({
               {route.Status}
             </span>
           </div>
-          <div className="w-1/3 flex items-center space-x-4 px-2 py-1">
-            <div className="flex items-center text-sm text-gray-600">
+          <div className="w-2/4 flex items-center space-x-4 px-2 py-1">
+            <div className="w-1/5 flex items-center text-sm text-gray-600">
               <span className="font-medium mr-1">Direction:</span>
               <span className="flex items-center">{route.Direction}</span>
             </div>
             
-            <div className="flex items-center text-sm text-gray-600">
+            <div className="w-1/5 flex items-center text-sm text-gray-600">
               <span className="font-medium mr-1">Stops:</span>
               <span>{route.Stops.length}</span>
             </div>
-            <div className="flex items-center text-sm text-gray-600">
+
+            <div className="w-3/5 flex items-center text-sm text-gray-600">
               {/* <span className="font-medium mr-1">Status:</span> */}
               <span className="flex">{route.Stops.map(stop => stop.StopName).join(', ')}</span>
             </div>
           </div>
-          <div className="w-1/3 justify-end flex space-x-2 px-2 py-1">
+          <div className="w-1/4 justify-end flex space-x-2 px-2 py-1">
             <button
               onClick={() => handleEdit(route)}
               className="px-3 py-1 bg-blue-500 text-white text-xs font-medium rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200"

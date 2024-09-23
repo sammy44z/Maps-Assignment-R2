@@ -1,4 +1,4 @@
-import Route from "../common/route";
+import Route from "../common/models/route";
 
   const mockRouteList: Route[] = [
     {

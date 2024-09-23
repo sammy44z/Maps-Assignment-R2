@@ -1,5 +1,5 @@
 import { createContext, Dispatch, SetStateAction } from "react";
-import Route from "../common/route";
+import Route from "../common/models/route";
 
 
 export interface RouteContextType {

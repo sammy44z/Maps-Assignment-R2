@@ -1,5 +1,5 @@
-import { useContext, useState } from "react";
-import Route from "../common/route";
+import { useContext, useRef, useState } from "react";
+import Route from "../common/models/route";
 import PopupComponent from "./CreateRoutePopup";
 import RouteDisplay from "./RouteDisplay";
 import RouteContext from "../context/routesContext";
@@ -13,6 +13,8 @@ function RoutesList() {
     setEditRoute(route);
     setIsPopupOpen(true);
   }
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function onclose() {
     // setEditRoute(undefined);
@@ -38,6 +40,24 @@ function RoutesList() {
     URL.revokeObjectURL(url);
   }
 
+  function handleImport(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          const importedRoutes = JSON.parse(content) as Route[];
+          setRoutesList(prevRoutes => [...prevRoutes, ...importedRoutes])
+        } catch (error) {
+          console.error("Error parsing JSON file:", error);
+          alert("Error importing file. Please make sure it's a valid JSON file.");
+        }
+      };
+      reader.readAsText(file);
+    }
+  }
+
   return (
     <>
       <div className="flex flex-col h-full">
@@ -51,9 +71,16 @@ function RoutesList() {
               >
                 Add Route
               </button>
-              {/* <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+              <button onClick={() => fileInputRef.current?.click()}  className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
                 Import
-              </button> */}
+              </button>
+              <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleImport}
+                  accept=".json"
+                />
               <button
                 onClick={handleExport}
                 className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded"
