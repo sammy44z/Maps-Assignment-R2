@@ -1,11 +1,11 @@
-interface Stop {
+export interface Stop {
     StopId: string;
     StopName: string;
     Latitude: number;
     Longitude: number;
   }
   
-  interface Route {
+interface Route {
     Name: string;
     Direction: 'UP' | 'DOWN';
     RouteId: string;
@@ -13,5 +13,5 @@ interface Stop {
     Stops: Stop[];
   }
 
-  export default Route;
+export default Route;
 

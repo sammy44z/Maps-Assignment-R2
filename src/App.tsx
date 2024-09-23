@@ -1,22 +1,21 @@
-import { Suspense } from "react";
-import MapView from "./components/MapView";
-import RoutesList from "./components/RoutesList";
 import { APIProvider } from "@vis.gl/react-google-maps";
+import { Outlet } from "react-router-dom";
+import RouteContext from "./context/routesContext";
+import { useState } from "react";
+import Route from "./common/route";
+import mockRouteList from "./Utils/mockData";
 
 function App() {
+
+  const [routesList, setRoutesList] = useState<Route[]>(mockRouteList);
+  const [selectedRoute, setSelectedRoute] = useState<Route>(mockRouteList[0]);
+  
   return (
-    // <Provider store={routeStore}>
-      <APIProvider apiKey={import.meta.env.VITE_REACT_GOOGLE_MAPS_API_KEY || ""}>
-        <div className="flex flex-col h-screen">
-          <div className="h-1/3 overflow-auto">
-            <RoutesList />
-          </div>
-          <div className="h-2/3">
-            <Suspense fallback={<div>Loading...</div>}>{<MapView />}</Suspense>
-          </div>
-        </div>
+    <RouteContext.Provider value={{ routesList, setRoutesList, selectedRoute, setSelectedRoute }}>
+      <APIProvider apiKey={"AIzaSyCItlF7EotBQE82cfgFVGBm5wzJGNNsUyg"}>
+        <Outlet />
       </APIProvider>
-    // </Provider>
+    </RouteContext.Provider>
   );
 }
 
