@@ -11,7 +11,7 @@ const PopupComponent: React.FC<PopupProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const { setRoutesList } = useContext(RouteContext);
+  const { setRoutesList, setSelectedRoute } = useContext(RouteContext);
   const [route, setRoute] = useState<Route>({
     Name: "",
     Direction: "UP",
@@ -109,11 +109,13 @@ const PopupComponent: React.FC<PopupProps> = ({
         Status: "Active",
         Stops: [],
       });
+      setSelectedRoute(route);
       onClose();
       return;
     }
     const list: Route[] = [...routesList];
     list.push(route);
+    setSelectedRoute(route);
     onSubmit(list);
     onClose();
   };
